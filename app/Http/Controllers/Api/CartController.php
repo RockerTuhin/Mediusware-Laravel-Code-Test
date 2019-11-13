@@ -15,8 +15,8 @@ class CartController extends Controller
     	if($check)
     	{
     		DB::table('carts')->where(['product_id'=>$id,'user_id'=>$user_id])->increment('product_quantity');
-    		
-    		$subtotal = $check->product_price * $check->product_quantity;
+    		$cart = DB::table('carts')->where(['product_id'=>$id,'user_id'=>$user_id])->first();
+    		$subtotal = $cart->product_price * $cart->product_quantity;
 
     		DB::table('carts')->where(['product_id'=>$id,'user_id'=>$user_id])->update(['subtotal'=>$subtotal]);
     	}
@@ -48,7 +48,7 @@ class CartController extends Controller
 
     public function incrementQuantity($id,$user_id)
     {
-    	DB::table('carts')->where('id',$id)->increment('product_quantity');
+    	DB::table('carts')->where(['id'=>$id,'user_id'=>$user_id])->increment('product_quantity');
 
     	$cart = DB::table('carts')->where(['id'=>$id,'user_id'=>$user_id])->first();
 

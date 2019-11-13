@@ -45,4 +45,16 @@ Route::get('/show-cart','Api\CartController@showCart');
 Route::get('/remove-from-cart/{id}/{user_id}','Api\CartController@removeFromCart');
 Route::get('/increment-quantity/{id}/{user_id}','Api\CartController@incrementQuantity');
 Route::get('/decrement-quantity/{id}/{user_id}','Api\CartController@decrementQuantity');
+Route::get('/vats','Api\POSController@vats');
+Route::post('/orderdone','Api\POSController@orderDone');
+Route::get('/todays-orders','Api\OrderController@todaysOrders');
+Route::get('/single-order/{id}','Api\OrderController@singleOrder');
+Route::get('/single-order-details/{id}','Api\OrderController@singleOrderDetails');
+Route::post('/search-by-date','Api\OrderController@searchByDate');
+Route::post('/search-by-month','Api\OrderController@searchByMonth');
+Route::get('/today-sell','Api\POSController@todaySell');
+Route::get('/today-income','Api\POSController@todayIncome');
+Route::get('/today-due','Api\POSController@todayDue');
+Route::get('/today-expense','Api\POSController@todayExpense');
+Route::get('/stockout-products','Api\POSController@stockoutProducts');
 

@@ -1,4 +1,4 @@
-index.vue<template>
+<template>
 	<div>
 		<!-- Breadcrumbs -->
 		<ol class="breadcrumb">

@@ -76,7 +76,7 @@
 	    		            </div>
 		            	</div>
 		            	<div class="col-md-6">
-		            		<img :src="form.photo" style="height:40px;width:40px;">
+		            		<img :src="'/inventoryWithVueAndAPI/public/'+form.photo" style="height:40px;width:40px;">
 		            	</div>
 		            </div>
 		          </div>

@@ -73,7 +73,7 @@
 				    		              <small class="text-danger" v-if="errors.photo">{{ errors.photo[0] }}</small>
 				    		            </div>
 					            	</div>
-					            	<div class="offset-md-3 col-md-3">
+					            	<div class="offset-md-4 col-md-2">
 					            		<img :src="form.photo" style="height:40px;width:40px;">
 					            	</div>
 					            </div>
@@ -85,7 +85,7 @@
 					  </div>
 					</div>
 			      <!-- End Customer add modal -->
-			      <form>
+			      
 			      	<div class="card-body">
 			       		<table class="table table-sm table-striped">
 						  <thead>
@@ -118,45 +118,48 @@
 			        	<ul class="list-group">
 						  <li class="list-group-item d-flex justify-content-between align-items-center">
 						    Total Quantity:
-						    <strong>12</strong>
+						    <strong>{{ totalQuantity }}</strong>
 						  </li>
 						  <li class="list-group-item d-flex justify-content-between align-items-center">
 						    Sub Total:
-						    <strong>100000</strong>
+						    <strong>{{ totalSubtotal }}</strong>
 						  </li>
 						  <li class="list-group-item d-flex justify-content-between align-items-center">
 						    Vat:
-						    <strong>5%</strong>
+						    <strong>{{ vats.vat }} %</strong>
 						  </li>
 						  <li class="list-group-item d-flex justify-content-between align-items-center">
 						    Total:
-						    <strong>120000</strong>
+						    <strong>{{ (((totalSubtotal * vats.vat) / 100) + totalSubtotal) }}</strong>
 						  </li>
 						</ul>
 						<br>
+						<form @submit.prevent="orderDone">
+							<div class="">
+								<label>Customer Name</label>
+								<select class="form-control" v-model="customer_id">
+									<option :value="customer.id" v-for="customer in customers">{{ customer.name }}</option>
+								</select>
+								<small class="text-danger" v-if="errors.customer_id">{{ errors.customer_id[0] }}</small>
+							</div>
+							<label>Pay</label>
+							<input type="" class="form-control" v-model="pay">
 
-						<label>Customer Name</label>
-						<select class="form-control">
-							<option v-for="customer in customers">{{ customer.name }}</option>
-						</select>
-
-						<label>Pay</label>
-						<input type="" class="form-control">
-
-						<label>Due</label>
-						<input type="" class="form-control">
-
-						<label>Pay By</label>
-						<select class="form-control">
-							<option>Hand Cash</option>
-							<option>Hand Cash</option>
-							<option>Hand Cash</option>
-						</select>
-						<br>
-						<button type="submit" class="btn btn-success">Submit</button>
+							<label>Due</label>
+							<input type="" class="form-control" v-model="due" readonly="">
+							<div class="">
+								<label>Pay By</label>
+								<select class="form-control" v-model="payBy">
+									<option value="HandCash">Hand Cash</option>
+									<option value="Cheaque">Cheaque</option>
+									<option value="GiftCard">Gift Card</option>
+								</select>
+								<small class="text-danger" v-if="errors.payBy">{{ errors.payBy[0] }}</small>
+							</div>
+							<br>
+							<button type="submit" class="btn btn-success">Submit</button>
+						</form>
 			        </div>
-			      </form>
-
 				</div>
 			</div>
 			<div class="col-lg-7 col-md-7">
@@ -180,7 +183,7 @@
 						   		<input type="text" class="form-control" placeholder="Search" v-model="searchTerm"><br>
 					       		<div class="row">
 						     		<div class="col-lg-3 col-md-3 col-sm-6 col-6" v-for="product in filterSearch">
-							      		<a class="btn btn-sm" @click.prevent="addToCart(product.id)">
+							      		<button class="btn btn-sm" @click.prevent="addToCart(product.id)" :disabled="product.product_quantity > 0 ? disabled : '' ">
 								       		<div class="card" style="width: 7rem;">
 												<img :src="product.image" id="employee_photo" class="card-img-top">
 												<div class="card-body">
@@ -189,7 +192,7 @@
 					                    			<span v-else="" class="badge badge-danger">Stock Out</span>
 											  	</div>
 								       		</div>
-							      		</a>
+							      		</button>
 						     		</div>
 					       		</div>
 							</div>
@@ -197,7 +200,7 @@
 								<input type="text" class="form-control" placeholder="Search" v-model="searchTerm"><br>
 					       		<div class="row">
 						     		<div class="col-lg-3 col-md-3 col-sm-6 col-6" v-for="categoryProduct in categoryWiseProductFilterSearch">
-							      		<a class="btn btn-sm" @click.prevent="addToCart(categoryProduct.id)">
+							      		<button class="btn btn-sm" @click.prevent="addToCart(categoryProduct.id)" :disabled="categoryProduct.product_quantity > 0 ? disabled : '' ">
 								       		<div class="card" style="width: 7rem;">
 												<img :src="categoryProduct.image" id="employee_photo" class="card-img-top">
 												<div class="card-body">
@@ -206,7 +209,7 @@
 					                    			<span v-else="" class="badge badge-danger">Stock Out</span>
 											  	</div>
 								       		</div>
-							      		</a>
+							      		</button>
 						     		</div>
 					       		</div>
 							</div>
@@ -231,6 +234,7 @@
 			this.allCategories();
 			this.allCustomers();
 			this.showCart();
+			this.vat();
 			Reload.$on('myEvent',() => {
 				this.showCart();
 			});
@@ -244,6 +248,11 @@
 				categories: [],
 				categoryProducts: [],
 				carts: [],
+				vats: [],
+				customer_id: '',
+				pay: '',
+				due: '',
+				payBy: '',
 				form: {
 					name: '',
 					email: '',
@@ -258,14 +267,43 @@
 			filterSearch()
 			{
 				return this.products.filter(product => {
-					return product.product_name.match(this.searchTerm);
+					return product.product_name.toLowerCase().match(this.searchTerm.toLowerCase());
 				});
 			},
 			categoryWiseProductFilterSearch()
 			{
 				return this.categoryProducts.filter(categoryProduct => {
-					return categoryProduct.product_name.match(this.searchTerm);
+					return categoryProduct.product_name.toLowerCase().match(this.searchTerm.toLowerCase());
 				});
+			},
+			totalQuantity()
+			{
+				let sum = 0;
+				for(let i = 0; i < this.carts.length;i++)
+				{
+					sum += parseFloat(this.carts[i].product_quantity);
+				}
+				return sum;
+			},
+			totalSubtotal()
+			{
+				let sum = 0;
+				for(let i = 0; i < this.carts.length;i++)
+				{
+					sum += parseFloat(this.carts[i].subtotal);
+				}
+				return sum;
+			}
+		},
+		watch:{
+			pay()
+			{
+				if(this.pay.length > 0){
+					this.due = (((this.totalSubtotal * this.vats.vat) / 100) + this.totalSubtotal) - this.pay;
+				}
+				else{
+					this.due = 0;
+				}
 			}
 		},
 		methods: {
@@ -374,6 +412,27 @@
 				.catch(error => {
 					this.errors = error.response.data.errors;
 				})
+			},
+			vat()
+			{
+				axios.get('api/vats')
+				.then(response => {
+					this.vats = response.data;
+				});
+			},
+			orderDone()
+			{
+				let user_id = User.id();
+				let total = (((this.totalSubtotal * this.vats.vat) / 100) + this.totalSubtotal);
+				let data = {totalQuantity: this.totalQuantity,totalSubtotal: this.totalSubtotal,vat: this.vats.vat,total: total,customer_id: this.customer_id,pay: this.pay,due: this.due,payBy: this.payBy,user_id: user_id};
+				axios.post('api/orderdone',data)
+				.then(response => {
+					Notification.success();
+					this.$router.push({name: 'home'});
+				})
+				.catch(error => {
+					this.errors = error.response.data.errors;
+				})
 			}
 		}
 	}
@@ -386,5 +445,9 @@
 	#employee_photo {
 		width: 100px;
 		height: 90px;
+	}
+	a.disabled {
+	  pointer-events: none;
+	  cursor: default;
 	}
 </style>

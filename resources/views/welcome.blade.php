@@ -50,7 +50,7 @@
     </form>
 
     <!-- Navbar -->
-    <ul class="navbar-nav ml-auto ml-md-0">
+    <ul class="navbar-nav ml-auto ml-md-0 navbar-right pull-right">
       <li class="nav-item dropdown no-arrow mx-1">
         <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-bell fa-fw"></i>
@@ -75,7 +75,7 @@
           <a class="dropdown-item" href="#">Something else here</a>
         </div>
       </li>
-      <li class="nav-item dropdown no-arrow">
+      <li class="nav-item dropdown no-arrow" >
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-user-circle fa-fw"></i>
         </a>
@@ -87,7 +87,6 @@
         </div>
       </li>
     </ul>
-
   </nav>
 
   <div id="wrapper">
@@ -180,6 +179,16 @@
             <router-link class="nav-link" to="/stock">
               <i class="fas fa-fw fa-table"></i>
               <span>Stock</span></router-link>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-fw fa-folder"></i>
+                <span>Orders</span>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+                <router-link class="dropdown-item" to="/todays-orders">Today's Orders</router-link>
+                <router-link class="dropdown-item" to="/search-order">Search Order</router-link>
+            </div>
         </li>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
